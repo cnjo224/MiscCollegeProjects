@@ -1,0 +1,90 @@
+<!DOCTYPE HTML>
+<!--
+Author: Caitlin Jones
+Date: 9/24/18
+CS 316 Project 1: Space Travel Calculator
+-->
+<html>
+<head>
+	<title>Space Travel Calculator</title>
+</head>
+
+<body>
+	<h1>Space Travel Calculator</h1>
+	<form action="./galactic_travel.cgi" target="_self"  method="GET">
+
+	<table>
+		<tr>
+			<td>
+				<p>Distance X:</p>
+			</td>
+			<td>
+				<input type="text" name="distx">
+			</td>
+			<td>
+				<p>Unit of X:</p>
+			</td>
+			<td>
+				<select name="unitx">
+					<option value="kilometer">kilometer</option>
+					<option value="parsec">parsec</option>
+					<option value="lightyear">lightyear</option>
+					<option value="xlarn">xlarn</option>
+				</select>
+			</td>
+		</tr>
+		<tr>
+        	        <td>
+                	        <p>Distance Y:</p>
+	                </td>
+        	        <td>
+                	        <input type="text" name="disty">
+	                </td>
+        	        <td>
+                	        <p>Unit of Y:</p>
+	                </td>
+        	        <td>
+                	        <select name="unity">
+                        	        <option value="kilometer">kilometer</option>
+                                	<option value="parsec">parsec</option>
+	                                <option value="lightyear">lightyear</option>
+        	                        <option value="xlarn">xlarn</option>
+                	        </select>
+	                </td>
+	        </tr>
+		<tr>
+			<td>
+				<p>Angle A:</p>
+			</td>
+			<td>
+				<input type="text" name="anglea">
+			</td>
+			<td>
+				<p>Units of A:</p>
+			</td>
+			<td>
+				<select name="unita">
+					<option value="degree">degree</option>
+					<option value="radian">radian</option>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p>Units of Answer:</p>
+			</td>
+			<td>
+				<select name="unitanswer">
+					<option value="kilometer">kilometer</option>
+                                        <option value="parsec">parsec</option>
+                                        <option value="lightyear">lightyear</option>
+                                        <option value="xlarn">xlarn</option>
+                                </select>
+
+			</td>
+	<table>
+	<input type="submit" value="submit">
+
+	</form>
+</body>
+</html>

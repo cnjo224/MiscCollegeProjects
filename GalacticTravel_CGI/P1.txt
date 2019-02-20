@@ -1,0 +1,40 @@
+Program 1 Write Up
+Author: Caitlin Jones
+Date: September 24, 2018
+URL: http://www.cs.uky.edu/~cnjo224/CS316/P1_Jones/form.html
+
+Description of Project:
+This project uses the law of cosines to calculate the distance between two points
+by using a common third point. The project also details converting between uncommon
+units. By the law of cosines, the units must be the same, thus if they are not, the
+code converts them into the same unit. After the calculations are complete, the
+code will convert the answer into the desired units the user specified.
+
+References:
+	https://www.w3schools.com/html/html_forms.asp
+	https://www.tutorialspoint.com/python3/python_cgi_programming.htm
+	https://www.pythoncentral.io/python-null-equivalent-none/
+	https://stackoverflow.com/questions/46520957/how-to-figure-if-a-variable-is-none-false-or-true-while-distinguishing-between
+	https://www.mathsisfun.com/algebra/trig-cosine-law.html
+	https://www.programiz.com/python-programming/modules/math
+	https://www.w3schools.com/python/python_try_except.asp
+	https://www.tutorialspoint.com/python/python_numbers.htm
+	https://stackoverflow.com/questions/24320630/global-name-sqrt-not-defined
+	https://stackoverflow.com/questions/379906/how-do-i-parse-a-string-to-a-float-or-int-in-python
+	https://stackoverflow.com/questions/2052390/manually-raising-throwing-an-exception-in-python
+
+Questions:
+ 1)If a field is missing the code will recognize a conversion error and output an input
+error statement. No other processes will be completed.
+
+ 2)If a field is blank, the cgi will throw an input error to the screen and quit.
+
+ 3)curl --data "distx=8&unitx=kilometer&disty=11&unity=kilometer&anglea=37&unita=radian&unitanswer=kilometer" http://www.cs.uky.edu/~cnjo224/CS316/P1_Jones/galactic_travel.cgi
+
+ 4)If a field value is too large, the program will output the answer as 'nan', which I
+assume is a native error to cgi, because I didn't handle this case specifically.
+
+ 5)I would add approximately 50-100 additional lines of code to the galactic_travel.cgi
+because my conversion factors are stored in a library. The form.html document would be
+innumerably large and would honestly be reformatted to have text unit input instead
+of drop down boxes that it currently boasts.
