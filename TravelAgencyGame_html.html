@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<!-- example/starter code -->
+<!-- also look at:  
+https://www.w3schools.com/jsref/tryit.asp?filename=tryjsref_table_insertrow
+
+Author: Caitlin Jones
+Date: 10-9-18
+Project: Create a game similar to trouble using the starter code provided in class
+-->
+<html lang="en">
+<head>
+<style>
+        table,td {
+                border: 1px solid black;
+        }
+        div{
+                float: left;
+                margin-right: 5px;
+        }
+</style>
+
+</head>
+
+<body>
+<h1>Xelkalai's Travel Agency</h1>
+
+<textarea readonly id="textarea" rows="10" cols=30>Welcome to Xelkalai's Travel Agency!</textarea>
+<textarea readonly id="textarea2" rows="10" cols=30></textarea>
+
+<!-- remember: example code! -->
+<table id="control">
+        <tr>
+		    <td id="Sabotage"><button disabled="true" id="SabotageBtn" onclick="sabotageNonkio()">Sabotage</td>
+            <td id="Move"><button disabled="true" id="MoveBtn" onclick="moveXel()">Move</td>
+            <td id="Pass"><button disabled="true" id="PassBtn" onclick="passTurn()">Pass</td>
+            <td id="Start"><button id="StartBtn" onclick="initTable()">Start</td>
+            <td id="Restart"><button id="RestartBtn" onclick="reloadPage()">Restart</td>
+        <tr>
+</table>
+<p>
+
+<div>
+        <table id="xTable"></table>
+</div>  
+<div>
+        <table id="nTable"></table>
+</div>
+<script>
+//BEGIN JAVASCRIPT IMPLEMENTATION
+var currShipName = null;
+var currShipID = null;
+var rollNum = null;
+var arrNonkioMoves = [1,1]; //started at 1 to avoid divide by zero error
+var sabotageCellID = null;
+var numSabotaged = 0;
+
+function reloadPage(){ location.reload(); }
+function randRoll(){ rollNum = Math.floor(Math.random() * 6) + 1; }
+
+function passTurn(){
+    //perform Nonkio's turn and prepare for Xelkalai's next turn
+    moveNonkio();
+    announceWinner();
+}//End passTurn()
+
+function sabotageNonkio(){
+    //if a valid cell in Nonkio's board was selected
+    if(sabotageCellID != null){
+        //set the text to Sabotaged with a red background color and increment the number of sabotages used
+        document.getElementById(sabotageCellID).innerHTML = "Sabotaged";
+        document.getElementById(sabotageCellID).style.backgroundColor = "tomato";
+        document.getElementById("textarea").innerHTML += "\nYou sabotaged Nonkio.";
+        numSabotaged++;
+
+        //Check if user used the maximum number of sabotages (3) and disable the button if needed
+        if(numSabotaged >= 3){document.getElementById("SabotageBtn").disabled = true;}
+
+        //Nonkio moves as normal, which is the same thing that happens after Xelkalai passes
+        passTurn();
+    }
+    sabotageCellID = null;
+}//End sabotageNonkio()
+
+function selectSabotage(){
+    var condition1 = this.id.indexOf("N0") == -1; // not the first row
+    var condition2 = this.id.indexOf("N19") == -1 // not the last row
+    var condition3 = this.innerHTML.indexOf("S") == -1; // doesn't contain 'Ship' or "Sabotaged"
+
+    if(condition1 && condition2 && condition3 && numSabotaged < 3){
+        //if it's a valid cell
+        sabotageCellID = this.id;
+    }
+    else{
+        document.getElementById("textarea").innerHTML += "\nThis cell is not eligible for sabotage.";
+    }
+}
+
+function moveXel(){
+	if(currShipName != null){
+		//this will actually move the ship
+		var fromCell = document.getElementById(currShipID);
+        fromCell.innerHTML = "Available";
+		fromCell.style.backgroundColor = "white";
+
+		//Find and set the new cell to the ship name
+		var oldRowNum = currShipID.substring(0,2).trim();
+		var newRowNum = parseInt(oldRowNum,10) + rollNum;
+		
+		if(newRowNum < 19){
+			var movedTo = document.getElementById(currShipID.replace(oldRowNum, newRowNum));
+		}else{
+			var movedTo = document.getElementById(currShipID.replace(oldRowNum, 19));
+			movedTo.removeEventListener("click", selectShip);
+		}
+		movedTo.innerHTML = currShipName;
+		movedTo.style.backgroundColor = "lime";
+        
+        //Once the ship is moved, reset the tracker variables
+        currShipName = null;
+        currShipID = null;
+		sabotageCellID = null;
+		//Perform Nokio's turn here
+		passTurn();
+    }//End if ship chosen
+} //End moveXel()
+
+function selectShip() {
+    //Check if the space the selected ship will move to is Sabotaged.
+    var currID = this.id
+    var oldRow = currID.substring(0,2).trim();
+    nextRow = parseInt(oldRow, 10) + rollNum;
+    //overflow of table
+    if(nextRow > 19){nextRow = 19;}
+    newRowText = document.getElementById(currID.replace(oldRow, nextRow)).innerHTML;
+    
+    //is valid ship with valid space to move to
+    if(currShipName == null && this.innerHTML.indexOf("Ship") != -1 && newRowText.indexOf("Sabotage") == -1){
+		currShipName = this.innerHTML;
+		currShipID = this.id;
+    }
+    else{ //space was Sabotaged. Don't register ship as valid option
+        if(newRowText.indexOf("Sabotage") != -1){
+            document.getElementById("textarea").innerHTML += "Can't move this ship due to sabotage. Choose another ship, sabotage, or pass.";            
+        }
+    }
+} //End selectShip()
+
+function announceWinner(){
+	//Last row cells in both tables
+	var xScout = document.getElementById("19 - 0");
+	var xPassenger = document.getElementById("19 - 1");
+	var nScout = document.getElementById("N19 - 0");
+	var nPassenger = document.getElementById("N19 - 1");
+    var state = false;
+	//Check if Xelkalai won
+	if(xScout.innerHTML.indexOf("Ship") != -1 && xPassenger.innerHTML.indexOf("Ship") != -1){
+		document.getElementById("textarea").innerHTML += "\nXelkalai Won!";
+		state = true;
+	}
+	else if(nScout.innerHTML.indexOf("Ship") != -1 && nPassenger.innerHTML.indexOf("Ship") != -1){
+		document.getElementById("textarea2").innerHTML += "\nNonkio Won!";
+        state = true;
+    }
+	else{ 
+		//No one has won yet
+		state = false;
+    }
+
+    //Check for winning state
+    if(!state){
+        //Once the turn is over, set up for the next turn
+        randRoll();
+        var tempText = "\nYour ship can move " + rollNum + " spaces.";
+        document.getElementById("textarea").innerHTML += tempText;
+    }else{
+        //A winner was chosen, disable buttons except for Restart
+        document.getElementById("SabotageBtn").disabled = true;
+        document.getElementById("MoveBtn").disabled = true;
+        document.getElementById("PassBtn").disabled = true;
+    }
+} //End announceWinner()
+
+function moveNonkio(){
+    //determine if Nonkio will sabotage; [0] is sabotage, [1] is move;
+    
+    var percentage = arrNonkioMoves[0] / arrNonkioMoves[1]
+    if(percentage < .2 && arrNonkioMoves[0] <=3){
+        //Perform Sabotage
+        arrNonkioMoves[0] += 1;
+        //pick two random numbers, 0 <= j <= 1, 0 <= i <= 19
+        var condition = false;
+        while(!condition){
+            var j = Math.round(Math.random());
+            var i = Math.floor(Math.random() * 18) + 1; //can't sabotage last row or first row
+            //test if numbers have a ship already on them
+            var sabo = document.getElementById((i + " - " + j));
+            if(sabo.innerHTML.indexOf("Ship") == -1 ){
+                condition = true;
+            }
+        }
+        sabo.innerHTML = "Sabotaged";
+        sabo.style.backgroundColor = "tomato";
+    }
+    else{
+        //Perform move
+        arrNonkioMoves[1] += 1;
+
+        //Generate the num of spaces to move
+        var roll = Math.floor(Math.random() * 6) + 1;
+
+        //Pick a ship to move. 0 is the Scout ship and 1 is the Passenger ship
+        var whichShip = Math.round(Math.random());
+        
+        //Make sure the designated ship isn't already at the end
+        var id = "N19 - " + whichShip;
+        if(document.getElementById(id).innerHTML.indexOf("Ship") != -1){
+            //This ship was at the end, so pick the other ship
+            if(whichShip == 0){ whichShip = 1;}
+            else{ whichShip = 0;}
+        }
+
+        //Iterate through Nonkio's Board and find the ship
+        for(var i = 0; i < 19; i++){
+            id = "N" + i + " - " + whichShip;
+            var cellValue = document.getElementById(id);
+            //if found in 'i' row
+            if(cellValue.innerHTML.indexOf("Ship") != -1){ break; }
+        }//End of for loop
+
+        //Move Nonkios ship from the old cell to the new one
+        var oldLocation = "N" + i + " - " + whichShip;
+        i += roll;
+
+        //control any overflow moves
+        if(i >= 19){ i = 19; }
+        var newLocation = "N" + i + " - " + whichShip;
+        if(document.getElementById(newLocation).innerHTML.indexOf("Sabotage") == -1){
+            //set the new location's text to the old location's (ship name)
+            document.getElementById(newLocation).innerHTML = document.getElementById(oldLocation).innerHTML;
+            document.getElementById(newLocation).style.backgroundColor = "lime";
+            //remove ship from old cell
+            document.getElementById(oldLocation).innerHTML = "Available";
+            document.getElementById(oldLocation).style.backgroundColor = "white";
+            
+            //output the move to the textarea2
+            var text = "\n" + document.getElementById(newLocation).innerHTML + " was moved " + roll + " spaces.";
+        }
+        else{
+            var text = "\n" + document.getElementById(newLocation).innerHTML + " couldn't be moved " + roll + " spaces due to Sabotage. Nonkio passes the turn.";
+        }
+        document.getElementById("textarea2").innerHTML += text;
+    }
+}//End of moveNonkio()
+
+function initTable() {
+	//Initialize the tables when the page loads
+    var xBoard = document.getElementById("xTable");
+    var nBoard = document.getElementById("nTable");
+        
+    //four columns 20 rows
+    for(var i = 0; i < 20; i++){
+        //This is each row in the table
+        var newXRow = xBoard.insertRow(-1);
+        var newNRow = nBoard.insertRow(-1);
+        for (var j = 0; j < 2; j++){
+            //These are the columns in each row
+            text = "Available";
+
+            //Xelkalai Table
+            var cellXCol = newXRow.insertCell(-1);
+            cellXCol.appendChild(document.createTextNode(text));
+            cellXCol.id = i + " - " + j;
+            cellXCol.addEventListener("click", selectShip, false);
+
+            //Nonkio Table - Has distinct id's from Xelkalai's table
+            var cellNCol = newNRow.insertCell(-1);
+            cellNCol.appendChild(document.createTextNode(text));
+            cellNCol.id = "N" + i + " - " + j;
+            cellNCol.addEventListener("click", selectSabotage, false);
+
+            //set the first row in each table with text and color
+            if(i == 0){
+                //j = 0, is the scout ship column
+                if(j == 0){
+                    cellXCol.innerHTML = "Scout Ship";
+                    cellXCol.style.backgroundColor = "lime";
+                    cellNCol.innerHTML = "Nonkio Scout Ship";
+                    cellNCol.style.backgroundColor = "lime";
+                    cellNCol.removeEventListener("click", selectSabotage, false);
+                }
+                else{//j = 1; the passenger ship column
+                    cellXCol.innerHTML = "Passenger Ship";
+                    cellXCol.style.backgroundColor = "lime";
+                    cellNCol.innerHTML = "Nonkio Passenger Ship";
+                    cellNCol.style.backgroundColor = "lime";
+                    cellNCol.removeEventListener("click", selectSabotage, false);
+                }
+            }//End of if i = 0
+            
+        }//inner for loop
+    }//outer for loop
+
+    //Initialize the roll and instruction text
+    randRoll();
+    var tempText = "Welcome! Each turn you can select a cell in Nonkio's path to sabotage, select one of Xelkalai's ships to move, or pass your turn.\n\nYour ship can move " + rollNum + " spaces.";
+    document.getElementById("textarea").innerHTML = tempText;
+
+    //Enable the MoveBtn and SabotageBtn
+    document.getElementById("MoveBtn").disabled = false;
+    document.getElementById("SabotageBtn").disabled = false;
+    document.getElementById("PassBtn").disabled = false;
+    document.getElementById("StartBtn").disabled = true;
+
+} //End initTable()
+//END JAVASCRIPT IMPLEMENTATION
+</script>
+
+</body>
+</html>
